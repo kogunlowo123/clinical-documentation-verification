@@ -1,0 +1,2125 @@
+{
+  "components": {
+    "schemas": {
+      "AllergyMention": {
+        "properties": {
+          "evidence": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "grounded": {
+            "default": true,
+            "title": "Grounded",
+            "type": "boolean"
+          },
+          "reaction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reaction"
+          },
+          "substance": {
+            "title": "Substance",
+            "type": "string"
+          }
+        },
+        "required": [
+          "substance"
+        ],
+        "title": "AllergyMention",
+        "type": "object"
+      },
+      "ApproveVerification": {
+        "additionalProperties": false,
+        "properties": {
+          "amended_note": {
+            "anyOf": [
+              {
+                "maxLength": 100000,
+                "minLength": 20,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Clinician-edited note text",
+            "title": "Amended Note"
+          },
+          "override_reason": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "minLength": 10,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Required to sign a note with critical findings or an inconsistent band",
+            "title": "Override Reason"
+          },
+          "statement": {
+            "description": "Clinician attestation, e.g. 'I have reviewed and verified this note.'",
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement"
+        ],
+        "title": "ApproveVerification",
+        "type": "object"
+      },
+      "Band": {
+        "enum": [
+          "consistent",
+          "needs_review",
+          "inconsistent"
+        ],
+        "title": "Band",
+        "type": "string"
+      },
+      "ClinicalExtraction": {
+        "properties": {
+          "allergies": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AllergyMention"
+            },
+            "title": "Allergies",
+            "type": "array"
+          },
+          "attempts": {
+            "default": 1,
+            "minimum": 0.0,
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "medications": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MedicationMention"
+            },
+            "title": "Medications",
+            "type": "array"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "no_known_allergies": {
+            "default": false,
+            "title": "No Known Allergies",
+            "type": "boolean"
+          },
+          "orders": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "title": "Orders",
+            "type": "array"
+          },
+          "problems": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProblemMention"
+            },
+            "title": "Problems",
+            "type": "array"
+          },
+          "source": {
+            "enum": [
+              "model",
+              "deterministic"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "title": "ClinicalExtraction",
+        "type": "object"
+      },
+      "Coding": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display"
+          },
+          "system": {
+            "title": "System",
+            "type": "string"
+          }
+        },
+        "required": [
+          "system",
+          "code"
+        ],
+        "title": "Coding",
+        "type": "object"
+      },
+      "ConsistencyReport": {
+        "properties": {
+          "band": {
+            "$ref": "#/components/schemas/Band"
+          },
+          "components": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "title": "Components",
+            "type": "object"
+          },
+          "critical_findings": {
+            "minimum": 0.0,
+            "title": "Critical Findings",
+            "type": "integer"
+          },
+          "rationale": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rationale",
+            "type": "array"
+          },
+          "score": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Score",
+            "type": "number"
+          }
+        },
+        "required": [
+          "score",
+          "band",
+          "components",
+          "critical_findings",
+          "rationale"
+        ],
+        "title": "ConsistencyReport",
+        "type": "object"
+      },
+      "DecisionView": {
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "title": "At",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "note_digest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note Digest"
+          },
+          "override_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Override Reason"
+          },
+          "practitioner": {
+            "title": "Practitioner",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Subject",
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "practitioner",
+          "decision",
+          "at",
+          "statement",
+          "override_reason",
+          "note_digest"
+        ],
+        "title": "DecisionView",
+        "type": "object"
+      },
+      "DiffEntry": {
+        "properties": {
+          "category": {
+            "enum": [
+              "problem",
+              "medication",
+              "allergy"
+            ],
+            "title": "Category",
+            "type": "string"
+          },
+          "chart_reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chart Reference"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "item": {
+            "title": "Item",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DiffKind"
+          }
+        },
+        "required": [
+          "category",
+          "kind",
+          "item",
+          "detail"
+        ],
+        "title": "DiffEntry",
+        "type": "object"
+      },
+      "DiffKind": {
+        "enum": [
+          "new",
+          "confirmed",
+          "changed",
+          "contradicted",
+          "discontinued",
+          "not_discussed"
+        ],
+        "title": "DiffKind",
+        "type": "string"
+      },
+      "Dose": {
+        "properties": {
+          "min_value": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Value"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "description": "Upper bound when a range was given",
+            "exclusiveMinimum": 0.0,
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "Dose",
+        "type": "object"
+      },
+      "FhirWriteResult": {
+        "properties": {
+          "document_reference": {
+            "title": "Document Reference",
+            "type": "string"
+          },
+          "provenance": {
+            "title": "Provenance",
+            "type": "string"
+          },
+          "written_at": {
+            "format": "date-time",
+            "title": "Written At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_reference",
+          "provenance",
+          "written_at"
+        ],
+        "title": "FhirWriteResult",
+        "type": "object"
+      },
+      "Finding": {
+        "properties": {
+          "evidence": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "item": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          }
+        },
+        "required": [
+          "rule",
+          "severity",
+          "message"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "Frequency": {
+        "properties": {
+          "code": {
+            "description": "Normalized code, e.g. DAILY, BID, Q6H, Q4-6H, ONCE",
+            "title": "Code",
+            "type": "string"
+          },
+          "doses_per_day": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doses Per Day"
+          },
+          "interval_hours": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interval Hours"
+          },
+          "one_time": {
+            "default": false,
+            "title": "One Time",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "Frequency",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "MedicationAction": {
+        "enum": [
+          "start",
+          "continue",
+          "change",
+          "stop",
+          "reported"
+        ],
+        "title": "MedicationAction",
+        "type": "string"
+      },
+      "MedicationMention": {
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/MedicationAction"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "grounded": {
+            "default": true,
+            "title": "Grounded",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "rxnorm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rxnorm"
+          },
+          "sig": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MedicationSig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "action"
+        ],
+        "title": "MedicationMention",
+        "type": "object"
+      },
+      "MedicationSig": {
+        "description": "A medication instruction parsed into structured, checkable parts.",
+        "properties": {
+          "dose": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Dose"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "drug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drug"
+          },
+          "form": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Form"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Frequency"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "indication": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Indication"
+          },
+          "prn": {
+            "default": false,
+            "title": "Prn",
+            "type": "boolean"
+          },
+          "quality_flags": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Quality Flags",
+            "type": "array"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Route"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "rxnorm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rxnorm"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "MedicationSig",
+        "type": "object"
+      },
+      "MentionStatus": {
+        "enum": [
+          "active",
+          "resolved",
+          "denied",
+          "historical"
+        ],
+        "title": "MentionStatus",
+        "type": "string"
+      },
+      "OrderItem": {
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MedicationAction"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coding": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Coding"
+            },
+            "title": "Coding",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "grounded": {
+            "default": true,
+            "title": "Grounded",
+            "type": "boolean"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/OrderKind"
+          },
+          "medication": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MedicationSig"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "default": "transcript",
+            "enum": [
+              "transcript",
+              "proposed"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "description"
+        ],
+        "title": "OrderItem",
+        "type": "object"
+      },
+      "OrderKind": {
+        "enum": [
+          "medication",
+          "lab",
+          "imaging",
+          "referral",
+          "procedure"
+        ],
+        "title": "OrderKind",
+        "type": "string"
+      },
+      "OrderValidationResult": {
+        "properties": {
+          "chart_checked": {
+            "title": "Chart Checked",
+            "type": "boolean"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/MedicationSig"
+            },
+            "title": "Orders",
+            "type": "array"
+          },
+          "safe_to_sign": {
+            "description": "True when no error or critical finding was raised",
+            "title": "Safe To Sign",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "orders",
+          "findings",
+          "chart_checked",
+          "safe_to_sign"
+        ],
+        "title": "OrderValidationResult",
+        "type": "object"
+      },
+      "ParseSig": {
+        "additionalProperties": false,
+        "properties": {
+          "text": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ParseSig",
+        "type": "object"
+      },
+      "PolicyOutcome": {
+        "properties": {
+          "action": {
+            "title": "Action",
+            "type": "string"
+          },
+          "decision": {
+            "title": "Decision",
+            "type": "string"
+          },
+          "fabric_decision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fabric Decision"
+          },
+          "matched_rules": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Matched Rules",
+            "type": "array"
+          },
+          "policy_digest": {
+            "title": "Policy Digest",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "decision",
+          "matched_rules",
+          "policy_version",
+          "policy_digest",
+          "reason"
+        ],
+        "title": "PolicyOutcome",
+        "type": "object"
+      },
+      "ProblemMention": {
+        "properties": {
+          "coding": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Coding"
+            },
+            "title": "Coding",
+            "type": "array"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "type": "integer"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "grounded": {
+            "default": true,
+            "title": "Grounded",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/MentionStatus"
+          }
+        },
+        "required": [
+          "name",
+          "status"
+        ],
+        "title": "ProblemMention",
+        "type": "object"
+      },
+      "ProposedOrder": {
+        "additionalProperties": false,
+        "description": "A draft medication order from the ordering system, in sig form.",
+        "properties": {
+          "text": {
+            "examples": [
+              "amoxicillin 500 mg PO TID x 10 days"
+            ],
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ProposedOrder",
+        "type": "object"
+      },
+      "RawUtterance": {
+        "additionalProperties": false,
+        "description": "One diarized turn as delivered by an ambient-capture or ASR system.",
+        "properties": {
+          "speaker": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Speaker",
+            "type": "string"
+          },
+          "start_s": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start S"
+          },
+          "text": {
+            "maxLength": 10000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "speaker",
+          "text"
+        ],
+        "title": "RawUtterance",
+        "type": "object"
+      },
+      "RejectVerification": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 2000,
+            "minLength": 10,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "RejectVerification",
+        "type": "object"
+      },
+      "Route": {
+        "enum": [
+          "PO",
+          "IV",
+          "IM",
+          "SC",
+          "SL",
+          "PR",
+          "INH",
+          "TOP",
+          "TD",
+          "OPH",
+          "OTIC",
+          "NASAL",
+          "NG"
+        ],
+        "title": "Route",
+        "type": "string"
+      },
+      "Section": {
+        "enum": [
+          "subjective",
+          "medications",
+          "objective",
+          "assessment_plan"
+        ],
+        "title": "Section",
+        "type": "string"
+      },
+      "SegmentedTranscript": {
+        "properties": {
+          "digest": {
+            "description": "sha256 of the canonical transcript text",
+            "title": "Digest",
+            "type": "string"
+          },
+          "speakers": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SpeakerRole"
+            },
+            "title": "Speakers",
+            "type": "object"
+          },
+          "utterances": {
+            "items": {
+              "$ref": "#/components/schemas/Utterance"
+            },
+            "title": "Utterances",
+            "type": "array"
+          }
+        },
+        "required": [
+          "utterances",
+          "speakers",
+          "digest"
+        ],
+        "title": "SegmentedTranscript",
+        "type": "object"
+      },
+      "Severity": {
+        "enum": [
+          "info",
+          "warning",
+          "error",
+          "critical"
+        ],
+        "title": "Severity",
+        "type": "string"
+      },
+      "SpeakerRole": {
+        "enum": [
+          "clinician",
+          "patient",
+          "caregiver",
+          "interpreter",
+          "other"
+        ],
+        "title": "SpeakerRole",
+        "type": "string"
+      },
+      "SubmitVerification": {
+        "additionalProperties": false,
+        "properties": {
+          "encounter_id": {
+            "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "note_type": {
+            "anyOf": [
+              {
+                "enum": [
+                  "11506-3",
+                  "34117-2",
+                  "11488-4",
+                  "18842-5",
+                  "34111-5"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "LOINC document type of the note",
+            "title": "Note Type"
+          },
+          "patient_id": {
+            "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "proposed_orders": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ProposedOrder"
+            },
+            "maxItems": 100,
+            "title": "Proposed Orders",
+            "type": "array"
+          },
+          "transcript": {
+            "$ref": "#/components/schemas/TranscriptInput"
+          }
+        },
+        "required": [
+          "patient_id",
+          "encounter_id",
+          "transcript"
+        ],
+        "title": "SubmitVerification",
+        "type": "object"
+      },
+      "TranscriptInput": {
+        "additionalProperties": false,
+        "description": "Either a labelled plain-text transcript or pre-diarized utterances.",
+        "properties": {
+          "speaker_roles": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SpeakerRole"
+            },
+            "description": "Optional mapping of speaker label to role, e.g. {'Speaker 1': 'clinician'}",
+            "title": "Speaker Roles",
+            "type": "object"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "maxLength": 200000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "utterances": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RawUtterance"
+                },
+                "maxItems": 5000,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utterances"
+          }
+        },
+        "title": "TranscriptInput",
+        "type": "object"
+      },
+      "Utterance": {
+        "properties": {
+          "index": {
+            "minimum": 0.0,
+            "title": "Index",
+            "type": "integer"
+          },
+          "role": {
+            "$ref": "#/components/schemas/SpeakerRole"
+          },
+          "section": {
+            "$ref": "#/components/schemas/Section"
+          },
+          "speaker": {
+            "title": "Speaker",
+            "type": "string"
+          },
+          "start_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start S"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "index",
+          "speaker",
+          "role",
+          "section",
+          "text"
+        ],
+        "title": "Utterance",
+        "type": "object"
+      },
+      "ValidateOrders": {
+        "additionalProperties": false,
+        "properties": {
+          "allergies": {
+            "default": [],
+            "items": {
+              "maxLength": 100,
+              "minLength": 2,
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Allergies",
+            "type": "array"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/ProposedOrder"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Orders",
+            "type": "array"
+          },
+          "patient_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "When set, chart allergies and active medications are checked",
+            "title": "Patient Id"
+          }
+        },
+        "required": [
+          "orders"
+        ],
+        "title": "ValidateOrders",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerificationList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/VerificationSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "limit",
+          "offset"
+        ],
+        "title": "VerificationList",
+        "type": "object"
+      },
+      "VerificationStatus": {
+        "enum": [
+          "pending_approval",
+          "approved",
+          "written",
+          "rejected"
+        ],
+        "title": "VerificationStatus",
+        "type": "string"
+      },
+      "VerificationSummary": {
+        "properties": {
+          "band": {
+            "title": "Band",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "critical_findings": {
+            "title": "Critical Findings",
+            "type": "integer"
+          },
+          "document_reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Reference"
+          },
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "extraction_source": {
+            "title": "Extraction Source",
+            "type": "string"
+          },
+          "findings": {
+            "title": "Findings",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VerificationStatus"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "patient_id",
+          "encounter_id",
+          "status",
+          "band",
+          "score",
+          "critical_findings",
+          "findings",
+          "extraction_source",
+          "document_reference",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "VerificationSummary",
+        "type": "object"
+      },
+      "VerificationView": {
+        "description": "Everything a signing clinician needs to review, with citations into the transcript.",
+        "properties": {
+          "chart_diff": {
+            "items": {
+              "$ref": "#/components/schemas/DiffEntry"
+            },
+            "title": "Chart Diff",
+            "type": "array"
+          },
+          "clinician_decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "consistency": {
+            "$ref": "#/components/schemas/ConsistencyReport"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "draft_note": {
+            "title": "Draft Note",
+            "type": "string"
+          },
+          "encounter_id": {
+            "title": "Encounter Id",
+            "type": "string"
+          },
+          "extraction": {
+            "$ref": "#/components/schemas/ClinicalExtraction"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "note_type": {
+            "title": "Note Type",
+            "type": "string"
+          },
+          "patient_id": {
+            "title": "Patient Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/VerificationStatus"
+          },
+          "submitted_by": {
+            "title": "Submitted By",
+            "type": "string"
+          },
+          "transcript": {
+            "$ref": "#/components/schemas/SegmentedTranscript"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "write": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FhirWriteResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "write_policy": {
+            "$ref": "#/components/schemas/PolicyOutcome"
+          }
+        },
+        "required": [
+          "id",
+          "patient_id",
+          "encounter_id",
+          "note_type",
+          "status",
+          "submitted_by",
+          "created_at",
+          "updated_at",
+          "consistency",
+          "findings",
+          "chart_diff",
+          "extraction",
+          "transcript",
+          "draft_note",
+          "write_policy",
+          "clinician_decision",
+          "write"
+        ],
+        "title": "VerificationView",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Agentic verification of clinical encounter documentation: transcript segmentation, structured extraction, FHIR chart reconciliation, order safety validation, consistency scoring and clinician-approved FHIR write-back.",
+    "title": "Clinical Documentation Verification",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/.well-known/agent-card.json": {
+      "get": {
+        "operationId": "agent_card__well_known_agent_card_json_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Agent Card  Well Known Agent Card Json Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Agent Card",
+        "tags": [
+          "a2a"
+        ]
+      }
+    },
+    "/a2a": {
+      "post": {
+        "description": "A2A JSON-RPC 2.0: message/send, tasks/get, tasks/cancel.",
+        "operationId": "a2a_rpc_a2a_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "id": {
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "jsonrpc": {
+                    "enum": [
+                      "2.0"
+                    ],
+                    "type": "string"
+                  },
+                  "method": {
+                    "enum": [
+                      "message/send",
+                      "tasks/get",
+                      "tasks/cancel"
+                    ],
+                    "type": "string"
+                  },
+                  "params": {
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "jsonrpc",
+                  "method"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "A2A Rpc",
+        "tags": [
+          "a2a"
+        ]
+      }
+    },
+    "/v1/medications/parse-sig": {
+      "post": {
+        "operationId": "parse_sig_v1_medications_parse_sig_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParseSig"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MedicationSig"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Parse Sig",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/v1/orders/validate": {
+      "post": {
+        "operationId": "validate_orders_v1_orders_validate_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateOrders"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderValidationResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Validate Orders",
+        "tags": [
+          "orders"
+        ]
+      }
+    },
+    "/v1/verifications": {
+      "get": {
+        "operationId": "list_verifications_v1_verifications_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "patient_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Patient Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/VerificationStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "maximum": 100000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Verifications",
+        "tags": [
+          "verification"
+        ]
+      },
+      "post": {
+        "description": "Run the full verification workflow; the result always awaits clinician sign-off.",
+        "operationId": "submit_verification_v1_verifications_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "idempotency-key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "minLength": 8,
+                  "pattern": "^[\\x21-\\x7e]+$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitVerification"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Submit Verification",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/v1/verifications/{verification_id}": {
+      "get": {
+        "operationId": "get_verification_v1_verifications__verification_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verification_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "title": "Verification Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Verification",
+        "tags": [
+          "verification"
+        ]
+      }
+    },
+    "/v1/verifications/{verification_id}/approve": {
+      "post": {
+        "description": "Clinician sign-off; writes the signed DocumentReference and Provenance to the chart.",
+        "operationId": "approve_verification_v1_verifications__verification_id__approve_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verification_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "title": "Verification Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveVerification"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Approve Verification",
+        "tags": [
+          "sign-off"
+        ]
+      }
+    },
+    "/v1/verifications/{verification_id}/reject": {
+      "post": {
+        "operationId": "reject_verification_v1_verifications__verification_id__reject_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verification_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "title": "Verification Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectVerification"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Reject Verification",
+        "tags": [
+          "sign-off"
+        ]
+      }
+    }
+  }
+}

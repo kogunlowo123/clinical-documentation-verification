@@ -1,0 +1,236 @@
+{
+  "$defs": {
+    "MedicationAction": {
+      "enum": [
+        "start",
+        "continue",
+        "change",
+        "stop",
+        "reported"
+      ],
+      "title": "MedicationAction",
+      "type": "string"
+    },
+    "MentionStatus": {
+      "enum": [
+        "active",
+        "resolved",
+        "denied",
+        "historical"
+      ],
+      "title": "MentionStatus",
+      "type": "string"
+    },
+    "ModelAllergy": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "reaction": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reaction"
+        },
+        "substance": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Substance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "substance",
+        "evidence"
+      ],
+      "title": "ModelAllergy",
+      "type": "object"
+    },
+    "ModelMedication": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/MedicationAction"
+        },
+        "evidence": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "sig_text": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sig Text"
+        }
+      },
+      "required": [
+        "name",
+        "action",
+        "evidence"
+      ],
+      "title": "ModelMedication",
+      "type": "object"
+    },
+    "ModelOrder": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "kind": {
+          "$ref": "#/$defs/OrderKind"
+        },
+        "sig_text": {
+          "anyOf": [
+            {
+              "maxLength": 500,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sig Text"
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "evidence"
+      ],
+      "title": "ModelOrder",
+      "type": "object"
+    },
+    "ModelProblem": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "items": {
+            "type": "integer"
+          },
+          "maxItems": 50,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "name": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/MentionStatus"
+        }
+      },
+      "required": [
+        "name",
+        "status",
+        "evidence"
+      ],
+      "title": "ModelProblem",
+      "type": "object"
+    },
+    "OrderKind": {
+      "enum": [
+        "medication",
+        "lab",
+        "imaging",
+        "referral",
+        "procedure"
+      ],
+      "title": "OrderKind",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/model-extraction.output.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The only shape the model may answer with.",
+  "properties": {
+    "allergies": {
+      "items": {
+        "$ref": "#/$defs/ModelAllergy"
+      },
+      "maxItems": 200,
+      "title": "Allergies",
+      "type": "array"
+    },
+    "medications": {
+      "items": {
+        "$ref": "#/$defs/ModelMedication"
+      },
+      "maxItems": 200,
+      "title": "Medications",
+      "type": "array"
+    },
+    "no_known_allergies": {
+      "default": false,
+      "title": "No Known Allergies",
+      "type": "boolean"
+    },
+    "orders": {
+      "items": {
+        "$ref": "#/$defs/ModelOrder"
+      },
+      "maxItems": 200,
+      "title": "Orders",
+      "type": "array"
+    },
+    "problems": {
+      "items": {
+        "$ref": "#/$defs/ModelProblem"
+      },
+      "maxItems": 200,
+      "title": "Problems",
+      "type": "array"
+    }
+  },
+  "title": "ModelExtraction",
+  "type": "object"
+}

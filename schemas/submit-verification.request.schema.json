@@ -1,0 +1,173 @@
+{
+  "$defs": {
+    "ProposedOrder": {
+      "additionalProperties": false,
+      "description": "A draft medication order from the ordering system, in sig form.",
+      "properties": {
+        "text": {
+          "examples": [
+            "amoxicillin 500 mg PO TID x 10 days"
+          ],
+          "maxLength": 500,
+          "minLength": 3,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "ProposedOrder",
+      "type": "object"
+    },
+    "RawUtterance": {
+      "additionalProperties": false,
+      "description": "One diarized turn as delivered by an ambient-capture or ASR system.",
+      "properties": {
+        "speaker": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Speaker",
+          "type": "string"
+        },
+        "start_s": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start S"
+        },
+        "text": {
+          "maxLength": 10000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "speaker",
+        "text"
+      ],
+      "title": "RawUtterance",
+      "type": "object"
+    },
+    "SpeakerRole": {
+      "enum": [
+        "clinician",
+        "patient",
+        "caregiver",
+        "interpreter",
+        "other"
+      ],
+      "title": "SpeakerRole",
+      "type": "string"
+    },
+    "TranscriptInput": {
+      "additionalProperties": false,
+      "description": "Either a labelled plain-text transcript or pre-diarized utterances.",
+      "properties": {
+        "speaker_roles": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SpeakerRole"
+          },
+          "description": "Optional mapping of speaker label to role, e.g. {'Speaker 1': 'clinician'}",
+          "title": "Speaker Roles",
+          "type": "object"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "maxLength": 200000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "utterances": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/RawUtterance"
+              },
+              "maxItems": 5000,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Utterances"
+        }
+      },
+      "title": "TranscriptInput",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/submit-verification.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "encounter_id": {
+      "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+      "title": "Encounter Id",
+      "type": "string"
+    },
+    "note_type": {
+      "anyOf": [
+        {
+          "enum": [
+            "11506-3",
+            "34117-2",
+            "11488-4",
+            "18842-5",
+            "34111-5"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "LOINC document type of the note",
+      "title": "Note Type"
+    },
+    "patient_id": {
+      "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "proposed_orders": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ProposedOrder"
+      },
+      "maxItems": 100,
+      "title": "Proposed Orders",
+      "type": "array"
+    },
+    "transcript": {
+      "$ref": "#/$defs/TranscriptInput"
+    }
+  },
+  "required": [
+    "patient_id",
+    "encounter_id",
+    "transcript"
+  ],
+  "title": "SubmitVerification",
+  "type": "object"
+}

@@ -1,0 +1,18 @@
+{
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/reject-verification.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "reason": {
+      "maxLength": 2000,
+      "minLength": 10,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "reason"
+  ],
+  "title": "RejectVerification",
+  "type": "object"
+}

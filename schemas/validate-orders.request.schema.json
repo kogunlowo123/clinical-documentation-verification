@@ -1,0 +1,68 @@
+{
+  "$defs": {
+    "ProposedOrder": {
+      "additionalProperties": false,
+      "description": "A draft medication order from the ordering system, in sig form.",
+      "properties": {
+        "text": {
+          "examples": [
+            "amoxicillin 500 mg PO TID x 10 days"
+          ],
+          "maxLength": 500,
+          "minLength": 3,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "ProposedOrder",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/validate-orders.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allergies": {
+      "default": [],
+      "items": {
+        "maxLength": 100,
+        "minLength": 2,
+        "type": "string"
+      },
+      "maxItems": 50,
+      "title": "Allergies",
+      "type": "array"
+    },
+    "orders": {
+      "items": {
+        "$ref": "#/$defs/ProposedOrder"
+      },
+      "maxItems": 100,
+      "minItems": 1,
+      "title": "Orders",
+      "type": "array"
+    },
+    "patient_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When set, chart allergies and active medications are checked",
+      "title": "Patient Id"
+    }
+  },
+  "required": [
+    "orders"
+  ],
+  "title": "ValidateOrders",
+  "type": "object"
+}

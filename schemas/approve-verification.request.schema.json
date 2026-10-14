@@ -1,0 +1,49 @@
+{
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/approve-verification.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "amended_note": {
+      "anyOf": [
+        {
+          "maxLength": 100000,
+          "minLength": 20,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Clinician-edited note text",
+      "title": "Amended Note"
+    },
+    "override_reason": {
+      "anyOf": [
+        {
+          "maxLength": 1000,
+          "minLength": 10,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Required to sign a note with critical findings or an inconsistent band",
+      "title": "Override Reason"
+    },
+    "statement": {
+      "description": "Clinician attestation, e.g. 'I have reviewed and verified this note.'",
+      "maxLength": 2000,
+      "minLength": 10,
+      "title": "Statement",
+      "type": "string"
+    }
+  },
+  "required": [
+    "statement"
+  ],
+  "title": "ApproveVerification",
+  "type": "object"
+}

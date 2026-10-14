@@ -1,0 +1,99 @@
+# Medication reference table used for order safety checks.
+#
+# Values are usual adult maximums from US prescribing information. They are
+# screening limits: an order above a limit is flagged for prescriber review,
+# not blocked as wrong. Pharmacy and Therapeutics must review this table
+# before go-live and own every change (CODEOWNERS). Organisations with a
+# commercial drug knowledge base load it through CDV_FORMULARY_FILE in the
+# same schema.
+#
+# unit: base unit the limits are expressed in (mg, mcg, unit, puff).
+# max_single_dose / max_daily_dose: null means no screening ceiling.
+# route_limits: per-route overrides of the limits.
+# classes: therapeutic and allergy classes used by duplication, interaction
+#          and allergy rules.
+# schedule: US DEA controlled-substance schedule.
+version: "2026.10.0"
+duplication_groups:
+  anticoagulant: {classes: [anticoagulant], severity: critical}
+  raas-blockade: {classes: [ace-inhibitor, arb], severity: warning}
+  nsaid: {classes: [nsaid], severity: warning}
+  statin: {classes: [statin], severity: warning}
+  beta-blocker: {classes: [beta-blocker], severity: warning}
+  ppi: {classes: [ppi], severity: warning}
+  opioid: {classes: [opioid], severity: warning}
+  ssri: {classes: [ssri], severity: warning}
+  antiplatelet-p2y12: {classes: [p2y12-inhibitor], severity: warning}
+interactions:
+  - id: opioid-benzodiazepine
+    classes: [opioid, benzodiazepine]
+    severity: critical
+    message: Concomitant opioid and benzodiazepine (FDA boxed warning, respiratory depression)
+  - id: nsaid-anticoagulant
+    classes: [nsaid, anticoagulant]
+    severity: warning
+    message: NSAID with an anticoagulant increases bleeding risk
+  - id: ssri-nsaid
+    classes: [ssri, nsaid]
+    severity: warning
+    message: SSRI with an NSAID increases gastrointestinal bleeding risk
+allergy_classes:
+  penicillin: {contraindicated: [penicillin], cross_reactive: [cephalosporin]}
+  cephalosporin: {contraindicated: [cephalosporin], cross_reactive: [penicillin]}
+  sulfa: {contraindicated: [sulfonamide-antibiotic], cross_reactive: []}
+  sulfonamide: {contraindicated: [sulfonamide-antibiotic], cross_reactive: []}
+  nsaid: {contraindicated: [nsaid], cross_reactive: [salicylate]}
+  nsaids: {contraindicated: [nsaid], cross_reactive: [salicylate]}
+  aspirin: {contraindicated: [salicylate], cross_reactive: [nsaid]}
+  opioid: {contraindicated: [opioid], cross_reactive: []}
+  opiate: {contraindicated: [opioid], cross_reactive: []}
+  codeine: {contraindicated: [], cross_reactive: [opioid]}
+  fluoroquinolone: {contraindicated: [fluoroquinolone], cross_reactive: []}
+  statin: {contraindicated: [statin], cross_reactive: []}
+  ace inhibitor: {contraindicated: [ace-inhibitor], cross_reactive: []}
+drugs:
+  - {name: acetaminophen, rxnorm: "161", synonyms: [paracetamol, tylenol, apap], classes: [analgesic], unit: mg, max_single_dose: 1000, max_daily_dose: 4000, routes: [PO, PR, IV, NG]}
+  - {name: ibuprofen, rxnorm: "5640", synonyms: [advil, motrin], classes: [nsaid], unit: mg, max_single_dose: 800, max_daily_dose: 3200, routes: [PO, IV, NG]}
+  - {name: naproxen, rxnorm: "7258", synonyms: [aleve, naprosyn], classes: [nsaid], unit: mg, max_single_dose: 750, max_daily_dose: 1500, routes: [PO]}
+  - {name: aspirin, rxnorm: "1191", synonyms: [asa, acetylsalicylic acid], classes: [salicylate, antiplatelet], unit: mg, max_single_dose: 1000, max_daily_dose: 4000, routes: [PO, PR, NG]}
+  - {name: metformin, rxnorm: "6809", synonyms: [glucophage], classes: [biguanide], unit: mg, max_single_dose: 1000, max_daily_dose: 2550, routes: [PO]}
+  - {name: glipizide, rxnorm: "4821", synonyms: [glucotrol], classes: [sulfonylurea], unit: mg, max_single_dose: 20, max_daily_dose: 40, routes: [PO]}
+  - {name: empagliflozin, rxnorm: "1545653", synonyms: [jardiance], classes: [sglt2-inhibitor], unit: mg, max_single_dose: 25, max_daily_dose: 25, routes: [PO]}
+  - {name: insulin glargine, rxnorm: "274783", synonyms: [lantus, basaglar, glargine], classes: [insulin-basal], unit: unit, max_single_dose: null, max_daily_dose: null, routes: [SC]}
+  - {name: lisinopril, rxnorm: "29046", synonyms: [prinivil, zestril], classes: [ace-inhibitor], unit: mg, max_single_dose: 80, max_daily_dose: 80, routes: [PO]}
+  - {name: losartan, rxnorm: "52175", synonyms: [cozaar], classes: [arb], unit: mg, max_single_dose: 100, max_daily_dose: 100, routes: [PO]}
+  - {name: amlodipine, rxnorm: "17767", synonyms: [norvasc], classes: [calcium-channel-blocker], unit: mg, max_single_dose: 10, max_daily_dose: 10, routes: [PO]}
+  - {name: hydrochlorothiazide, rxnorm: "5487", synonyms: [hctz], classes: [thiazide, sulfonamide-nonantibiotic], unit: mg, max_single_dose: 50, max_daily_dose: 50, routes: [PO]}
+  - {name: metoprolol, rxnorm: "6918", synonyms: [lopressor, toprol, metoprolol tartrate, metoprolol succinate], classes: [beta-blocker], unit: mg, max_single_dose: 400, max_daily_dose: 450, routes: [PO, IV], route_limits: {IV: {max_single_dose: 5, max_daily_dose: 15}}}
+  - {name: carvedilol, rxnorm: "20352", synonyms: [coreg], classes: [beta-blocker], unit: mg, max_single_dose: 50, max_daily_dose: 100, routes: [PO]}
+  - {name: furosemide, rxnorm: "4603", synonyms: [lasix], classes: [loop-diuretic], unit: mg, max_single_dose: 200, max_daily_dose: 600, routes: [PO, IV, IM]}
+  - {name: spironolactone, rxnorm: "9997", synonyms: [aldactone], classes: [potassium-sparing-diuretic], unit: mg, max_single_dose: 400, max_daily_dose: 400, routes: [PO]}
+  - {name: atorvastatin, rxnorm: "83367", synonyms: [lipitor], classes: [statin], unit: mg, max_single_dose: 80, max_daily_dose: 80, routes: [PO]}
+  - {name: simvastatin, rxnorm: "36567", synonyms: [zocor], classes: [statin], unit: mg, max_single_dose: 40, max_daily_dose: 40, routes: [PO]}
+  - {name: apixaban, rxnorm: "1364430", synonyms: [eliquis], classes: [anticoagulant], unit: mg, max_single_dose: 10, max_daily_dose: 20, routes: [PO, NG]}
+  - {name: rivaroxaban, rxnorm: "1114195", synonyms: [xarelto], classes: [anticoagulant], unit: mg, max_single_dose: 20, max_daily_dose: 30, routes: [PO, NG]}
+  - {name: enoxaparin, rxnorm: "67108", synonyms: [lovenox], classes: [anticoagulant], unit: mg, max_single_dose: null, max_daily_dose: null, routes: [SC, IV]}
+  - {name: heparin, rxnorm: "5224", synonyms: [], classes: [anticoagulant], unit: unit, max_single_dose: null, max_daily_dose: null, routes: [SC, IV]}
+  - {name: clopidogrel, rxnorm: "32968", synonyms: [plavix], classes: [p2y12-inhibitor, antiplatelet], unit: mg, max_single_dose: 600, max_daily_dose: 600, routes: [PO, NG]}
+  - {name: levothyroxine, rxnorm: "10582", synonyms: [synthroid, levoxyl], classes: [thyroid-hormone], unit: mcg, max_single_dose: null, max_daily_dose: null, routes: [PO, IV]}
+  - {name: omeprazole, rxnorm: "7646", synonyms: [prilosec], classes: [ppi], unit: mg, max_single_dose: 120, max_daily_dose: 360, routes: [PO, NG]}
+  - {name: pantoprazole, rxnorm: "40790", synonyms: [protonix], classes: [ppi], unit: mg, max_single_dose: 120, max_daily_dose: 240, routes: [PO, IV]}
+  - {name: amoxicillin, rxnorm: "723", synonyms: [amoxil], classes: [penicillin], unit: mg, max_single_dose: 2000, max_daily_dose: 4000, routes: [PO]}
+  - {name: cephalexin, rxnorm: "2231", synonyms: [keflex], classes: [cephalosporin], unit: mg, max_single_dose: 1000, max_daily_dose: 4000, routes: [PO]}
+  - {name: ceftriaxone, rxnorm: "2193", synonyms: [rocephin], classes: [cephalosporin], unit: mg, max_single_dose: 2000, max_daily_dose: 4000, routes: [IV, IM]}
+  - {name: azithromycin, rxnorm: "18631", synonyms: [zithromax, z-pak, zpak], classes: [macrolide], unit: mg, max_single_dose: 2000, max_daily_dose: 2000, routes: [PO, IV]}
+  - {name: ciprofloxacin, rxnorm: "2551", synonyms: [cipro], classes: [fluoroquinolone], unit: mg, max_single_dose: 750, max_daily_dose: 1500, routes: [PO, IV], route_limits: {IV: {max_single_dose: 400, max_daily_dose: 1200}}}
+  - {name: doxycycline, rxnorm: "3640", synonyms: [vibramycin], classes: [tetracycline], unit: mg, max_single_dose: 200, max_daily_dose: 200, routes: [PO, IV]}
+  - {name: sulfamethoxazole-trimethoprim, rxnorm: "10831", synonyms: [bactrim, septra, tmp-smx, smx-tmp], classes: [sulfonamide-antibiotic], unit: tablet, max_single_dose: 2, max_daily_dose: 4, routes: [PO]}
+  - {name: ondansetron, rxnorm: "26225", synonyms: [zofran], classes: [antiemetic], unit: mg, max_single_dose: 24, max_daily_dose: 24, routes: [PO, IV, IM], route_limits: {IV: {max_single_dose: 16, max_daily_dose: 32}}}
+  - {name: gabapentin, rxnorm: "25480", synonyms: [neurontin], classes: [gabapentinoid], unit: mg, max_single_dose: 1200, max_daily_dose: 3600, routes: [PO]}
+  - {name: sertraline, rxnorm: "36437", synonyms: [zoloft], classes: [ssri], unit: mg, max_single_dose: 200, max_daily_dose: 200, routes: [PO]}
+  - {name: morphine, rxnorm: "7052", synonyms: [ms contin], classes: [opioid], schedule: CII, unit: mg, max_single_dose: null, max_daily_dose: null, routes: [PO, IV, IM, SC, PR]}
+  - {name: oxycodone, rxnorm: "7804", synonyms: [oxycontin, roxicodone], classes: [opioid], schedule: CII, unit: mg, max_single_dose: null, max_daily_dose: null, routes: [PO]}
+  - {name: hydromorphone, rxnorm: "3423", synonyms: [dilaudid], classes: [opioid], schedule: CII, unit: mg, max_single_dose: null, max_daily_dose: null, routes: [PO, IV, IM, SC]}
+  - {name: tramadol, rxnorm: "10689", synonyms: [ultram], classes: [opioid], schedule: CIV, unit: mg, max_single_dose: 100, max_daily_dose: 400, routes: [PO]}
+  - {name: lorazepam, rxnorm: "6470", synonyms: [ativan], classes: [benzodiazepine], schedule: CIV, unit: mg, max_single_dose: 4, max_daily_dose: 10, routes: [PO, IV, IM, SL]}
+  - {name: alprazolam, rxnorm: "596", synonyms: [xanax], classes: [benzodiazepine], schedule: CIV, unit: mg, max_single_dose: 2, max_daily_dose: 10, routes: [PO]}
+  - {name: albuterol, rxnorm: "435", synonyms: [proair, ventolin, salbutamol], classes: [short-acting-beta-agonist], unit: puff, max_single_dose: null, max_daily_dose: null, routes: [INH]}
+  - {name: montelukast, rxnorm: "88249", synonyms: [singulair], classes: [leukotriene-antagonist], unit: mg, max_single_dose: 10, max_daily_dose: 10, routes: [PO]}
+  - {name: prednisone, rxnorm: "8640", synonyms: [deltasone], classes: [corticosteroid], unit: mg, max_single_dose: null, max_daily_dose: null, routes: [PO]}

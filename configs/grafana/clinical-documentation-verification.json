@@ -1,0 +1,78 @@
+{
+  "title": "Clinical Documentation Verification",
+  "uid": "clinical-documentation-verification",
+  "schemaVersion": 39,
+  "time": {"from": "now-24h", "to": "now"},
+  "templating": {
+    "list": [
+      {"name": "datasource", "type": "datasource", "query": "prometheus"}
+    ]
+  },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Request success (5m)",
+      "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "fieldConfig": {"defaults": {"unit": "percentunit", "decimals": 3}},
+      "targets": [{"expr": "1 - cdv:request_errors:ratio_5m"}]
+    },
+    {
+      "id": 2, "type": "timeseries", "title": "Verifications by consistency band",
+      "gridPos": {"x": 6, "y": 0, "w": 9, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (band) (increase(cdv_verifications_total[1h]))", "legendFormat": "{{band}}"}]
+    },
+    {
+      "id": 3, "type": "heatmap", "title": "Consistency score distribution",
+      "gridPos": {"x": 15, "y": 0, "w": 9, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (le) (increase(cdv_consistency_score_bucket[1h]))", "format": "heatmap", "legendFormat": "{{le}}"}]
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "Order-safety findings by rule",
+      "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (rule, severity) (increase(cdv_findings_total[1h]))", "legendFormat": "{{severity}} {{rule}}"}]
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "Chart reconciliation outcomes",
+      "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [{"expr": "sum by (category, kind) (increase(cdv_chart_diff_total[1h]))", "legendFormat": "{{category}} {{kind}}"}]
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "Clinician decisions and chart writes",
+      "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [
+        {"expr": "sum by (decision, override) (increase(cdv_clinician_decisions_total[1h]))", "legendFormat": "{{decision}} override={{override}}"},
+        {"expr": "sum by (outcome) (increase(cdv_fhir_writes_total[1h]))", "legendFormat": "write {{outcome}}"}
+      ]
+    },
+    {
+      "id": 7, "type": "timeseries", "title": "Model extraction outcome and spend",
+      "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [
+        {"expr": "sum by (outcome) (rate(cdv_model_extraction_attempts_total[15m]))", "legendFormat": "{{outcome}}"},
+        {"expr": "sum(rate(agentic_model_cost_USD_total[1h])) * 3600", "legendFormat": "USD per hour"}
+      ]
+    },
+    {
+      "id": 8, "type": "timeseries", "title": "p95 latency by route",
+      "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (le, route) (rate(cdv_http_request_duration_seconds_bucket[5m])))", "legendFormat": "{{route}}"}]
+    },
+    {
+      "id": 9, "type": "timeseries", "title": "MCP tool calls and A2A requests",
+      "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8},
+      "datasource": {"type": "prometheus", "uid": "${datasource}"},
+      "targets": [
+        {"expr": "sum by (tool, outcome) (rate(cdv_mcp_tool_calls_total[5m]))", "legendFormat": "mcp {{tool}} {{outcome}}"},
+        {"expr": "sum by (method, outcome) (rate(cdv_a2a_requests_total[5m]))", "legendFormat": "a2a {{method}} {{outcome}}"}
+      ]
+    }
+  ]
+}

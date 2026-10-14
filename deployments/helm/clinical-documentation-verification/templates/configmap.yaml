@@ -1,0 +1,48 @@
+{{- $c := .Values.cdv -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cdv.fullname" . }}
+  labels: {{- include "cdv.labels" . | nindent 4 }}
+data:
+  CDV_ENVIRONMENT: {{ $c.environment | quote }}
+  CDV_PUBLIC_URL: {{ required "cdv.publicUrl is required" $c.publicUrl | quote }}
+  CDV_LOG_LEVEL: {{ $c.logLevel | quote }}
+  CDV_DEFAULT_NOTE_TYPE: {{ $c.defaultNoteType | quote }}
+  CDV_FHIR_BASE_URL: {{ required "cdv.fhir.baseUrl is required" $c.fhir.baseUrl | quote }}
+  CDV_FHIR_AUTH: smart-backend
+  CDV_FHIR_TOKEN_URL: {{ required "cdv.fhir.tokenUrl is required" $c.fhir.tokenUrl | quote }}
+  CDV_FHIR_CLIENT_ID: {{ required "cdv.fhir.clientId is required" $c.fhir.clientId | quote }}
+  CDV_FHIR_KEY_ID: {{ required "cdv.fhir.keyId is required" $c.fhir.keyId | quote }}
+  CDV_FHIR_SIGNING_ALG: {{ $c.fhir.signingAlg | quote }}
+  CDV_FHIR_SCOPE: {{ $c.fhir.scope | quote }}
+  CDV_FHIR_PRIVATE_KEY_FILE: /etc/clinical-documentation-verification/fhir-client/fhir-client.pem
+  CDV_CLINICIAN_ISSUER: {{ required "cdv.clinician.issuer is required" $c.clinician.issuer | quote }}
+  CDV_CLINICIAN_AUDIENCE: {{ required "cdv.clinician.audience is required" $c.clinician.audience | quote }}
+  CDV_CLINICIAN_JWKS_URL: {{ required "cdv.clinician.jwksUrl is required" $c.clinician.jwksUrl | quote }}
+  CDV_CLINICIAN_ROLES_CLAIM: {{ $c.clinician.rolesClaim | quote }}
+  CDV_CLINICIAN_FHIR_USER_CLAIM: {{ $c.clinician.fhirUserClaim | quote }}
+  CDV_AGENT_ID: {{ required "cdv.identityFabric.agentId is required" $c.identityFabric.agentId | quote }}
+  {{- with $c.identityFabric.url }}
+  CDV_FABRIC_URL: {{ . | quote }}
+  CDV_WORKLOAD_TOKEN_FILE: /var/run/secrets/identity-fabric/token
+  {{- end }}
+  {{- if $c.agentJwks.issuer }}
+  CDV_AGENT_ISSUER: {{ $c.agentJwks.issuer | quote }}
+  CDV_AGENT_JWKS_URL: {{ required "cdv.agentJwks.jwksUrl is required with agentJwks.issuer" $c.agentJwks.jwksUrl | quote }}
+  CDV_AGENT_AUDIENCE: {{ $c.agentJwks.audience | quote }}
+  {{- end }}
+  CDV_AUDIT_KEY_FILE: {{ printf "/etc/clinical-documentation-verification/audit-key/%s" (required "secrets.auditKeyFile is required" .Values.secrets.auditKeyFile) | quote }}
+  {{- if $c.models.enabled }}
+  CDV_PROVIDERS_FILE: /app/configs/providers.yaml
+  CDV_EXTRACTION_MAX_ATTEMPTS: {{ $c.models.maxAttempts | quote }}
+  AWS_REGION: {{ required "cdv.models.awsRegion is required" $c.models.awsRegion | quote }}
+  CDV_BEDROCK_PRIMARY_MODEL_ID: {{ required "cdv.models.primaryModelId is required" $c.models.primaryModelId | quote }}
+  CDV_BEDROCK_PRIMARY_INPUT_USD_PER_MTOK: {{ required "cdv.models.primaryInputUsdPerMtok is required" $c.models.primaryInputUsdPerMtok | quote }}
+  CDV_BEDROCK_PRIMARY_OUTPUT_USD_PER_MTOK: {{ required "cdv.models.primaryOutputUsdPerMtok is required" $c.models.primaryOutputUsdPerMtok | quote }}
+  CDV_BEDROCK_FALLBACK_INPUT_USD_PER_MTOK: {{ required "cdv.models.fallbackInputUsdPerMtok is required" $c.models.fallbackInputUsdPerMtok | quote }}
+  CDV_BEDROCK_FALLBACK_OUTPUT_USD_PER_MTOK: {{ required "cdv.models.fallbackOutputUsdPerMtok is required" $c.models.fallbackOutputUsdPerMtok | quote }}
+  {{- end }}
+  {{- with $c.otlpEndpoint }}
+  CDV_OTLP_ENDPOINT: {{ . | quote }}
+  {{- end }}

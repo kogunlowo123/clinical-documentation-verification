@@ -1,0 +1,37 @@
+# Foundation model providers for clinical extraction (agentic-core ModelRouter).
+#
+# Amazon Bedrock is the primary provider: transcripts are PHI (classification 3,
+# RESTRICTED), so only providers covered by a BAA and approved for the data
+# residency of the deployment may be listed. Credentials come from the AWS
+# default chain (EKS Pod Identity / IRSA), never from this file.
+#
+# ${NAME} values are resolved from the environment at start-up and loading
+# fails if any is unset. Prices are the contracted rates for the account.
+# Required variables are listed in docs/operations/configuration.md.
+#
+# The service runs without this file (CDV_PROVIDERS_FILE unset): extraction is
+# then rule-based only, which is also the fallback whenever every provider fails.
+providers:
+  - kind: bedrock
+    profile:
+      name: bedrock-primary
+      model: ${CDV_BEDROCK_PRIMARY_MODEL_ID}
+      region: ${AWS_REGION}
+      max_classification: 3
+      input_cost_per_mtok: ${CDV_BEDROCK_PRIMARY_INPUT_USD_PER_MTOK}
+      output_cost_per_mtok: ${CDV_BEDROCK_PRIMARY_OUTPUT_USD_PER_MTOK}
+      max_context_tokens: 200000
+      tasks: [extract]
+    timeout_s: 60
+
+  - kind: bedrock
+    profile:
+      name: bedrock-fallback
+      model: amazon.nova-pro-v1:0
+      region: ${AWS_REGION}
+      max_classification: 3
+      input_cost_per_mtok: ${CDV_BEDROCK_FALLBACK_INPUT_USD_PER_MTOK}
+      output_cost_per_mtok: ${CDV_BEDROCK_FALLBACK_OUTPUT_USD_PER_MTOK}
+      max_context_tokens: 300000
+      tasks: [extract]
+    timeout_s: 60

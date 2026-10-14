@@ -1,0 +1,97 @@
+# Domain policy for clinical documentation verification.
+# Evaluated by the agentic-core PolicyEngine for every API call, MCP tool call,
+# A2A message and chart write. Combining: deny overrides, then
+# require_approval, then allow; anything unmatched is denied.
+#
+# Subject attributes: kind (user | agent | service), roles (clinicians, from the
+# enterprise IdP), scopes and action_in_scope (agents, from the identity
+# fabric credential), delegated, fhir_user and fhir_user_type (SMART fhirUser).
+# Resource attributes on verifications: status, band, critical_findings.
+# Environment: override_reason (approval), clinician_approved (chart writes).
+# risk: 1=LOW 2=MODERATE 3=HIGH 4=CRITICAL
+name: documentation-verification
+version: "2026.10.0"
+rules:
+  - id: deny-agent-signoff
+    description: Agents never approve or reject documentation; only a clinician signs.
+    effect: deny
+    actions: ["documentation:approve", "documentation:reject"]
+    conditions:
+      - {attribute: subject.kind, operator: ne, value: user}
+
+  - id: deny-signoff-without-practitioner-identity
+    description: The signer must be identified as a FHIR Practitioner (SMART fhirUser claim).
+    effect: deny
+    actions: ["documentation:approve"]
+    conditions:
+      - {attribute: subject.fhir_user_type, operator: not_in, value: [Practitioner, PractitionerRole]}
+
+  - id: deny-signoff-without-fhir-user
+    description: A clinician token without a fhirUser claim cannot sign.
+    effect: deny
+    actions: ["documentation:approve"]
+    conditions:
+      - {attribute: subject.fhir_user_type, operator: exists, value: false}
+
+  - id: deny-approval-with-unresolved-critical-findings
+    description: Critical findings (e.g. allergy contraindication) need an explicit override reason.
+    effect: deny
+    actions: ["documentation:approve"]
+    conditions:
+      - {attribute: resource.critical_findings, operator: gt, value: 0}
+      - {attribute: environment.override_reason, operator: exists, value: false}
+
+  - id: deny-approval-of-inconsistent-note-without-override
+    description: An inconsistent note may be signed only with a documented override reason.
+    effect: deny
+    actions: ["documentation:approve"]
+    conditions:
+      - {attribute: resource.band, operator: eq, value: inconsistent}
+      - {attribute: environment.override_reason, operator: exists, value: false}
+
+  - id: deny-delegated-agent-submission
+    description: Transcripts are PHI; agents acting under delegation may read but not submit them.
+    effect: deny
+    actions: ["documentation:verify"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: agent}
+      - {attribute: subject.delegated, operator: eq, value: true}
+
+  - id: approve-chart-writes
+    description: Writing to the legal medical record requires a clinician signature.
+    effect: require_approval
+    actions: ["fhir:write:*"]
+    conditions:
+      - {attribute: environment.clinician_approved, operator: ne, value: true}
+
+  - id: allow-chart-write-after-signature
+    description: The service writes the signed note and its provenance after clinician approval.
+    effect: allow
+    actions: ["fhir:write:DocumentReference"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: service}
+      - {attribute: environment.clinician_approved, operator: eq, value: true}
+
+  - id: allow-clinician-signoff
+    description: Physicians, nurse practitioners and physician assistants sign documentation.
+    effect: allow
+    actions: ["documentation:approve", "documentation:reject"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: user}
+      - {attribute: subject.roles, operator: contains_any, value: [physician, nurse-practitioner, physician-assistant]}
+
+  - id: allow-care-team-documentation
+    description: Care-team members and scribes submit transcripts, read verifications and check orders.
+    effect: allow
+    actions: ["documentation:verify", "documentation:read", "orders:validate"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: user}
+      - {attribute: subject.roles, operator: contains_any, value: [physician, nurse-practitioner, physician-assistant, registered-nurse, medical-scribe]}
+
+  - id: allow-scoped-agents
+    description: Agents may perform an action when their fabric credential carries it as a scope.
+    effect: allow
+    actions: ["documentation:verify", "documentation:read", "orders:validate"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: agent}
+      - {attribute: subject.action_in_scope, operator: eq, value: true}

@@ -1,0 +1,209 @@
+{
+  "$defs": {
+    "Dose": {
+      "properties": {
+        "min_value": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Value"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "description": "Upper bound when a range was given",
+          "exclusiveMinimum": 0,
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Dose",
+      "type": "object"
+    },
+    "Frequency": {
+      "properties": {
+        "code": {
+          "description": "Normalized code, e.g. DAILY, BID, Q6H, Q4-6H, ONCE",
+          "title": "Code",
+          "type": "string"
+        },
+        "doses_per_day": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doses Per Day"
+        },
+        "interval_hours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interval Hours"
+        },
+        "one_time": {
+          "default": false,
+          "title": "One Time",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Frequency",
+      "type": "object"
+    },
+    "Route": {
+      "enum": [
+        "PO",
+        "IV",
+        "IM",
+        "SC",
+        "SL",
+        "PR",
+        "INH",
+        "TOP",
+        "TD",
+        "OPH",
+        "OTIC",
+        "NASAL",
+        "NG"
+      ],
+      "title": "Route",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/medication-sig.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "A medication instruction parsed into structured, checkable parts.",
+  "properties": {
+    "dose": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Dose"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "drug": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Drug"
+    },
+    "form": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Form"
+    },
+    "frequency": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Frequency"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "indication": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Indication"
+    },
+    "prn": {
+      "default": false,
+      "title": "Prn",
+      "type": "boolean"
+    },
+    "quality_flags": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Quality Flags",
+      "type": "array"
+    },
+    "route": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Route"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "rxnorm": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Rxnorm"
+    },
+    "text": {
+      "title": "Text",
+      "type": "string"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "title": "MedicationSig",
+  "type": "object"
+}

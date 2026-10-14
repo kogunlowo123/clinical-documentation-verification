@@ -1,0 +1,90 @@
+{
+  "$defs": {
+    "VerificationStatus": {
+      "enum": [
+        "pending_approval",
+        "approved",
+        "written",
+        "rejected"
+      ],
+      "title": "VerificationStatus",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/verification-summary.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "band": {
+      "title": "Band",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "critical_findings": {
+      "title": "Critical Findings",
+      "type": "integer"
+    },
+    "document_reference": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Document Reference"
+    },
+    "encounter_id": {
+      "title": "Encounter Id",
+      "type": "string"
+    },
+    "extraction_source": {
+      "title": "Extraction Source",
+      "type": "string"
+    },
+    "findings": {
+      "title": "Findings",
+      "type": "integer"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "patient_id": {
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "score": {
+      "title": "Score",
+      "type": "number"
+    },
+    "status": {
+      "$ref": "#/$defs/VerificationStatus"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "patient_id",
+    "encounter_id",
+    "status",
+    "band",
+    "score",
+    "critical_findings",
+    "findings",
+    "extraction_source",
+    "document_reference",
+    "created_at",
+    "updated_at"
+  ],
+  "title": "VerificationSummary",
+  "type": "object"
+}

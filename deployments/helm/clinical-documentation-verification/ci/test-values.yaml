@@ -1,0 +1,31 @@
+# Values used by CI to render and schema-validate the chart (helm lint,
+# helm template | kubeconform). They describe a complete, valid deployment.
+cdv:
+  publicUrl: https://cdv.clinical.ci.internal
+  fhir:
+    baseUrl: https://ehr.ci.internal/fhir/r4
+    tokenUrl: https://ehr.ci.internal/oauth2/token
+    clientId: cdv-backend-ci
+    keyId: cdv-2026-10
+  clinician:
+    issuer: https://login.ci.internal
+    audience: clinical-documentation
+    jwksUrl: https://login.ci.internal/jwks
+  identityFabric:
+    url: https://identity.agents.ci.internal
+    agentId: spiffe://agents.ci.internal/agent/clinical/documentation-verification
+  models:
+    awsRegion: us-east-1
+    primaryModelId: us.amazon.nova-premier-v1:0
+    primaryInputUsdPerMtok: "3"
+    primaryOutputUsdPerMtok: "15"
+    fallbackInputUsdPerMtok: "0.8"
+    fallbackOutputUsdPerMtok: "3.2"
+secrets:
+  auditKeyFile: audit-2026-10.pem
+ingress:
+  enabled: true
+  className: nginx
+  host: cdv.clinical.ci.internal
+serviceMonitor:
+  enabled: true

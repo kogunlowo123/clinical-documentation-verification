@@ -1,0 +1,83 @@
+# Local development stack: verification service + PostgreSQL + HAPI FHIR R4 server
+# seeded with one synthetic patient + an OIDC provider for clinician and agent
+# tokens + an OpenTelemetry collector. Uses an in-memory audit key and an
+# unauthenticated FHIR server (both refused when CDV_ENVIRONMENT=production);
+# never use this configuration outside a developer workstation.
+name: clinical-documentation-verification
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: cdv
+      POSTGRES_USER: cdv
+      POSTGRES_PASSWORD: cdv-local-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cdv -d cdv"]
+      interval: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  fhir:
+    image: hapiproject/hapi:v7.4.0
+    environment:
+      hapi.fhir.fhir_version: R4
+      hapi.fhir.allow_external_references: "true"
+    ports:
+      - "8090:8080"
+
+  fhir-seed:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      fhir:
+        condition: service_started
+    volumes:
+      - ./deployments/docker/synthetic-chart.json:/seed/synthetic-chart.json:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        until curl -sf http://fhir:8080/fhir/metadata > /dev/null; do sleep 3; done;
+        curl -sf -X POST -H 'Content-Type: application/fhir+json'
+        --data-binary @/seed/synthetic-chart.json http://fhir:8080/fhir
+
+  oidc:
+    image: ghcr.io/navikt/mock-oauth2-server:2.1.10
+    environment:
+      SERVER_PORT: "8080"
+    ports:
+      - "8081:8080"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./deployments/docker/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+
+  cdv:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      fhir-seed:
+        condition: service_completed_successfully
+      oidc:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      CDV_ENVIRONMENT: development
+      CDV_PUBLIC_URL: http://localhost:8080
+      CDV_DATABASE_URL: postgresql+asyncpg://cdv:cdv-local-only@postgres:5432/cdv
+      CDV_FHIR_BASE_URL: http://fhir:8080/fhir
+      CDV_FHIR_AUTH: none
+      CDV_CLINICIAN_ISSUER: http://oidc:8080/clinicians
+      CDV_CLINICIAN_AUDIENCE: clinical-documentation
+      CDV_CLINICIAN_JWKS_URL: http://oidc:8080/clinicians/jwks
+      CDV_DEV_EPHEMERAL_AUDIT_KEY: "true"
+      CDV_AUDIT_LOG_PATH: /var/lib/clinical-documentation-verification/audit/audit.jsonl
+      CDV_OTLP_ENDPOINT: http://otel-collector:4317
+      CDV_LOG_LEVEL: DEBUG
+
+volumes:
+  pgdata:

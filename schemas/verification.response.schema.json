@@ -1,0 +1,1056 @@
+{
+  "$defs": {
+    "AllergyMention": {
+      "properties": {
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "grounded": {
+          "default": true,
+          "title": "Grounded",
+          "type": "boolean"
+        },
+        "reaction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reaction"
+        },
+        "substance": {
+          "title": "Substance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "substance"
+      ],
+      "title": "AllergyMention",
+      "type": "object"
+    },
+    "Band": {
+      "enum": [
+        "consistent",
+        "needs_review",
+        "inconsistent"
+      ],
+      "title": "Band",
+      "type": "string"
+    },
+    "ClinicalExtraction": {
+      "properties": {
+        "allergies": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AllergyMention"
+          },
+          "title": "Allergies",
+          "type": "array"
+        },
+        "attempts": {
+          "default": 1,
+          "minimum": 0,
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "medications": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MedicationMention"
+          },
+          "title": "Medications",
+          "type": "array"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Model"
+        },
+        "no_known_allergies": {
+          "default": false,
+          "title": "No Known Allergies",
+          "type": "boolean"
+        },
+        "orders": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OrderItem"
+          },
+          "title": "Orders",
+          "type": "array"
+        },
+        "problems": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProblemMention"
+          },
+          "title": "Problems",
+          "type": "array"
+        },
+        "source": {
+          "enum": [
+            "model",
+            "deterministic"
+          ],
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "ClinicalExtraction",
+      "type": "object"
+    },
+    "Coding": {
+      "properties": {
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "display": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display"
+        },
+        "system": {
+          "title": "System",
+          "type": "string"
+        }
+      },
+      "required": [
+        "system",
+        "code"
+      ],
+      "title": "Coding",
+      "type": "object"
+    },
+    "ConsistencyReport": {
+      "properties": {
+        "band": {
+          "$ref": "#/$defs/Band"
+        },
+        "components": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Components",
+          "type": "object"
+        },
+        "critical_findings": {
+          "minimum": 0,
+          "title": "Critical Findings",
+          "type": "integer"
+        },
+        "rationale": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Rationale",
+          "type": "array"
+        },
+        "score": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "score",
+        "band",
+        "components",
+        "critical_findings",
+        "rationale"
+      ],
+      "title": "ConsistencyReport",
+      "type": "object"
+    },
+    "DecisionView": {
+      "properties": {
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "note_digest": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note Digest"
+        },
+        "override_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Override Reason"
+        },
+        "practitioner": {
+          "title": "Practitioner",
+          "type": "string"
+        },
+        "statement": {
+          "title": "Statement",
+          "type": "string"
+        },
+        "subject": {
+          "title": "Subject",
+          "type": "string"
+        }
+      },
+      "required": [
+        "subject",
+        "practitioner",
+        "decision",
+        "at",
+        "statement",
+        "override_reason",
+        "note_digest"
+      ],
+      "title": "DecisionView",
+      "type": "object"
+    },
+    "DiffEntry": {
+      "properties": {
+        "category": {
+          "enum": [
+            "problem",
+            "medication",
+            "allergy"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "chart_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chart Reference"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "item": {
+          "title": "Item",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/DiffKind"
+        }
+      },
+      "required": [
+        "category",
+        "kind",
+        "item",
+        "detail"
+      ],
+      "title": "DiffEntry",
+      "type": "object"
+    },
+    "DiffKind": {
+      "enum": [
+        "new",
+        "confirmed",
+        "changed",
+        "contradicted",
+        "discontinued",
+        "not_discussed"
+      ],
+      "title": "DiffKind",
+      "type": "string"
+    },
+    "Dose": {
+      "properties": {
+        "min_value": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Value"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "description": "Upper bound when a range was given",
+          "exclusiveMinimum": 0,
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Dose",
+      "type": "object"
+    },
+    "FhirWriteResult": {
+      "properties": {
+        "document_reference": {
+          "title": "Document Reference",
+          "type": "string"
+        },
+        "provenance": {
+          "title": "Provenance",
+          "type": "string"
+        },
+        "written_at": {
+          "format": "date-time",
+          "title": "Written At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "document_reference",
+        "provenance",
+        "written_at"
+      ],
+      "title": "FhirWriteResult",
+      "type": "object"
+    },
+    "Finding": {
+      "properties": {
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "item": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        }
+      },
+      "required": [
+        "rule",
+        "severity",
+        "message"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "Frequency": {
+      "properties": {
+        "code": {
+          "description": "Normalized code, e.g. DAILY, BID, Q6H, Q4-6H, ONCE",
+          "title": "Code",
+          "type": "string"
+        },
+        "doses_per_day": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doses Per Day"
+        },
+        "interval_hours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interval Hours"
+        },
+        "one_time": {
+          "default": false,
+          "title": "One Time",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Frequency",
+      "type": "object"
+    },
+    "MedicationAction": {
+      "enum": [
+        "start",
+        "continue",
+        "change",
+        "stop",
+        "reported"
+      ],
+      "title": "MedicationAction",
+      "type": "string"
+    },
+    "MedicationMention": {
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/MedicationAction"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "grounded": {
+          "default": true,
+          "title": "Grounded",
+          "type": "boolean"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "rxnorm": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rxnorm"
+        },
+        "sig": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MedicationSig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "action"
+      ],
+      "title": "MedicationMention",
+      "type": "object"
+    },
+    "MedicationSig": {
+      "description": "A medication instruction parsed into structured, checkable parts.",
+      "properties": {
+        "dose": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Dose"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "drug": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Drug"
+        },
+        "form": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Form"
+        },
+        "frequency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Frequency"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "indication": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Indication"
+        },
+        "prn": {
+          "default": false,
+          "title": "Prn",
+          "type": "boolean"
+        },
+        "quality_flags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Quality Flags",
+          "type": "array"
+        },
+        "route": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Route"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rxnorm": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rxnorm"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "MedicationSig",
+      "type": "object"
+    },
+    "MentionStatus": {
+      "enum": [
+        "active",
+        "resolved",
+        "denied",
+        "historical"
+      ],
+      "title": "MentionStatus",
+      "type": "string"
+    },
+    "OrderItem": {
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MedicationAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "coding": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Coding",
+          "type": "array"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "grounded": {
+          "default": true,
+          "title": "Grounded",
+          "type": "boolean"
+        },
+        "kind": {
+          "$ref": "#/$defs/OrderKind"
+        },
+        "medication": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MedicationSig"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source": {
+          "default": "transcript",
+          "enum": [
+            "transcript",
+            "proposed"
+          ],
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "description"
+      ],
+      "title": "OrderItem",
+      "type": "object"
+    },
+    "OrderKind": {
+      "enum": [
+        "medication",
+        "lab",
+        "imaging",
+        "referral",
+        "procedure"
+      ],
+      "title": "OrderKind",
+      "type": "string"
+    },
+    "PolicyOutcome": {
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "decision": {
+          "title": "Decision",
+          "type": "string"
+        },
+        "fabric_decision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fabric Decision"
+        },
+        "matched_rules": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Matched Rules",
+          "type": "array"
+        },
+        "policy_digest": {
+          "title": "Policy Digest",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "decision",
+        "matched_rules",
+        "policy_version",
+        "policy_digest",
+        "reason"
+      ],
+      "title": "PolicyOutcome",
+      "type": "object"
+    },
+    "ProblemMention": {
+      "properties": {
+        "coding": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Coding",
+          "type": "array"
+        },
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "grounded": {
+          "default": true,
+          "title": "Grounded",
+          "type": "boolean"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/MentionStatus"
+        }
+      },
+      "required": [
+        "name",
+        "status"
+      ],
+      "title": "ProblemMention",
+      "type": "object"
+    },
+    "Route": {
+      "enum": [
+        "PO",
+        "IV",
+        "IM",
+        "SC",
+        "SL",
+        "PR",
+        "INH",
+        "TOP",
+        "TD",
+        "OPH",
+        "OTIC",
+        "NASAL",
+        "NG"
+      ],
+      "title": "Route",
+      "type": "string"
+    },
+    "Section": {
+      "enum": [
+        "subjective",
+        "medications",
+        "objective",
+        "assessment_plan"
+      ],
+      "title": "Section",
+      "type": "string"
+    },
+    "SegmentedTranscript": {
+      "properties": {
+        "digest": {
+          "description": "sha256 of the canonical transcript text",
+          "title": "Digest",
+          "type": "string"
+        },
+        "speakers": {
+          "additionalProperties": {
+            "$ref": "#/$defs/SpeakerRole"
+          },
+          "title": "Speakers",
+          "type": "object"
+        },
+        "utterances": {
+          "items": {
+            "$ref": "#/$defs/Utterance"
+          },
+          "title": "Utterances",
+          "type": "array"
+        }
+      },
+      "required": [
+        "utterances",
+        "speakers",
+        "digest"
+      ],
+      "title": "SegmentedTranscript",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "SpeakerRole": {
+      "enum": [
+        "clinician",
+        "patient",
+        "caregiver",
+        "interpreter",
+        "other"
+      ],
+      "title": "SpeakerRole",
+      "type": "string"
+    },
+    "Utterance": {
+      "properties": {
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "role": {
+          "$ref": "#/$defs/SpeakerRole"
+        },
+        "section": {
+          "$ref": "#/$defs/Section"
+        },
+        "speaker": {
+          "title": "Speaker",
+          "type": "string"
+        },
+        "start_s": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start S"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "speaker",
+        "role",
+        "section",
+        "text"
+      ],
+      "title": "Utterance",
+      "type": "object"
+    },
+    "VerificationStatus": {
+      "enum": [
+        "pending_approval",
+        "approved",
+        "written",
+        "rejected"
+      ],
+      "title": "VerificationStatus",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/verification.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Everything a signing clinician needs to review, with citations into the transcript.",
+  "properties": {
+    "chart_diff": {
+      "items": {
+        "$ref": "#/$defs/DiffEntry"
+      },
+      "title": "Chart Diff",
+      "type": "array"
+    },
+    "clinician_decision": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DecisionView"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "consistency": {
+      "$ref": "#/$defs/ConsistencyReport"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "draft_note": {
+      "title": "Draft Note",
+      "type": "string"
+    },
+    "encounter_id": {
+      "title": "Encounter Id",
+      "type": "string"
+    },
+    "extraction": {
+      "$ref": "#/$defs/ClinicalExtraction"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "note_type": {
+      "title": "Note Type",
+      "type": "string"
+    },
+    "patient_id": {
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/VerificationStatus"
+    },
+    "submitted_by": {
+      "title": "Submitted By",
+      "type": "string"
+    },
+    "transcript": {
+      "$ref": "#/$defs/SegmentedTranscript"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "write": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FhirWriteResult"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "write_policy": {
+      "$ref": "#/$defs/PolicyOutcome"
+    }
+  },
+  "required": [
+    "id",
+    "patient_id",
+    "encounter_id",
+    "note_type",
+    "status",
+    "submitted_by",
+    "created_at",
+    "updated_at",
+    "consistency",
+    "findings",
+    "chart_diff",
+    "extraction",
+    "transcript",
+    "draft_note",
+    "write_policy",
+    "clinician_decision",
+    "write"
+  ],
+  "title": "VerificationView",
+  "type": "object"
+}

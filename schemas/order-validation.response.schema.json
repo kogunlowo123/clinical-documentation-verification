@@ -1,0 +1,296 @@
+{
+  "$defs": {
+    "Dose": {
+      "properties": {
+        "min_value": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Min Value"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "description": "Upper bound when a range was given",
+          "exclusiveMinimum": 0,
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Dose",
+      "type": "object"
+    },
+    "Finding": {
+      "properties": {
+        "evidence": {
+          "default": [],
+          "items": {
+            "type": "integer"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "item": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "rule": {
+          "title": "Rule",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        }
+      },
+      "required": [
+        "rule",
+        "severity",
+        "message"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "Frequency": {
+      "properties": {
+        "code": {
+          "description": "Normalized code, e.g. DAILY, BID, Q6H, Q4-6H, ONCE",
+          "title": "Code",
+          "type": "string"
+        },
+        "doses_per_day": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doses Per Day"
+        },
+        "interval_hours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Interval Hours"
+        },
+        "one_time": {
+          "default": false,
+          "title": "One Time",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "title": "Frequency",
+      "type": "object"
+    },
+    "MedicationSig": {
+      "description": "A medication instruction parsed into structured, checkable parts.",
+      "properties": {
+        "dose": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Dose"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "drug": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Drug"
+        },
+        "form": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Form"
+        },
+        "frequency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Frequency"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "indication": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Indication"
+        },
+        "prn": {
+          "default": false,
+          "title": "Prn",
+          "type": "boolean"
+        },
+        "quality_flags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Quality Flags",
+          "type": "array"
+        },
+        "route": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Route"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rxnorm": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rxnorm"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "MedicationSig",
+      "type": "object"
+    },
+    "Route": {
+      "enum": [
+        "PO",
+        "IV",
+        "IM",
+        "SC",
+        "SL",
+        "PR",
+        "INH",
+        "TOP",
+        "TD",
+        "OPH",
+        "OTIC",
+        "NASAL",
+        "NG"
+      ],
+      "title": "Route",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-documentation-verification/schemas/order-validation.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "chart_checked": {
+      "title": "Chart Checked",
+      "type": "boolean"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "orders": {
+      "items": {
+        "$ref": "#/$defs/MedicationSig"
+      },
+      "title": "Orders",
+      "type": "array"
+    },
+    "safe_to_sign": {
+      "description": "True when no error or critical finding was raised",
+      "title": "Safe To Sign",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "orders",
+    "findings",
+    "chart_checked",
+    "safe_to_sign"
+  ],
+  "title": "OrderValidationResult",
+  "type": "object"
+}

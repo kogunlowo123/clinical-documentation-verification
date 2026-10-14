@@ -1,0 +1,98 @@
+# PrometheusRule-compatible alert rules. Load with the Prometheus Operator
+# (wrap in a PrometheusRule) or a rule_files entry.
+# SLOs (docs/architecture/agent-specification.md):
+#   availability  99.9% of API requests succeed (non-5xx, excluding upstream 503s)
+#   latency       p95 POST /v1/verifications < 5 s (model path), p95 reads < 300 ms
+#   safety        no chart write without a clinician decision (audited invariant)
+groups:
+  - name: clinical-documentation-verification.slo
+    rules:
+      - record: cdv:request_errors:ratio_5m
+        expr: |
+          sum(rate(cdv_http_request_duration_seconds_count{status=~"5..",status!="503"}[5m]))
+          /
+          clamp_min(sum(rate(cdv_http_request_duration_seconds_count[5m])), 1e-9)
+
+      - alert: CdvErrorBudgetBurnFast
+        expr: cdv:request_errors:ratio_5m > (14.4 * 0.001)
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: Documentation verification burning error budget 14x faster than sustainable
+          runbook: docs/runbooks/incident-response.md#elevated-5xx
+
+      - alert: CdvVerificationLatencyHigh
+        expr: |
+          histogram_quantile(0.95, sum by (le) (
+            rate(cdv_http_request_duration_seconds_bucket{route="/v1/verifications",method="POST"}[10m])
+          )) > 5
+        for: 15m
+        labels: {severity: ticket}
+        annotations:
+          summary: p95 verification latency above 5 s
+          runbook: docs/runbooks/monitoring.md#latency
+
+  - name: clinical-documentation-verification.dependencies
+    rules:
+      - alert: CdvFhirUnavailable
+        expr: |
+          sum(rate(cdv_http_request_duration_seconds_count{status="503"}[10m]))
+          /
+          clamp_min(sum(rate(cdv_http_request_duration_seconds_count[10m])), 1e-9) > 0.05
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: More than 5% of requests fail because the FHIR server or identity fabric is unavailable
+          runbook: docs/runbooks/incident-response.md#fhir-outage
+
+      - alert: CdvChartWriteFailures
+        expr: increase(cdv_fhir_writes_total{outcome="failed"}[30m]) > 3
+        labels: {severity: page}
+        annotations:
+          summary: Signed notes are failing to reach the chart; clinicians must retry approval
+          runbook: docs/runbooks/incident-response.md#chart-write-failures
+
+      - alert: CdvModelFallbackSustained
+        expr: |
+          sum(rate(cdv_model_extraction_attempts_total{outcome="fallback"}[30m]))
+          /
+          clamp_min(sum(rate(cdv_model_extraction_attempts_total[30m])), 1e-9) > 0.25
+        for: 30m
+        labels: {severity: ticket}
+        annotations:
+          summary: Over 25% of verifications fall back to rule-based extraction (Bedrock errors or invalid output)
+          runbook: docs/runbooks/monitoring.md#model-fallback
+
+  - name: clinical-documentation-verification.safety
+    rules:
+      - alert: CdvCriticalFindingSpike
+        expr: sum(increase(cdv_findings_total{severity="critical"}[1h])) > 20
+        labels: {severity: ticket}
+        annotations:
+          summary: Unusual number of critical medication-safety findings in the last hour
+          runbook: docs/runbooks/monitoring.md#critical-findings
+
+      - alert: CdvOverrideRateHigh
+        expr: |
+          sum(increase(cdv_clinician_decisions_total{decision="approved",override="true"}[1d]))
+          /
+          clamp_min(sum(increase(cdv_clinician_decisions_total{decision="approved"}[1d])), 1) > 0.1
+        labels: {severity: ticket}
+        annotations:
+          summary: More than 10% of sign-offs override critical findings; review with clinical safety
+          runbook: docs/runbooks/monitoring.md#overrides
+
+      - alert: CdvPromptInjectionDetected
+        expr: increase(cdv_findings_total{rule="prompt-injection-detected"}[1h]) > 0
+        labels: {severity: ticket}
+        annotations:
+          summary: Transcript content was blocked by the content guard
+          runbook: docs/runbooks/incident-response.md#prompt-injection
+
+      - alert: CdvNotReady
+        expr: sum(up{job="clinical-documentation-verification"}) < 2
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: Fewer than two replicas are being scraped
+          runbook: docs/runbooks/incident-response.md#replicas-down
